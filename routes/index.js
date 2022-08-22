@@ -8,7 +8,7 @@ const router = express.Router();
 module.exports = (params) => {
     // index page
     router.get('/', (request, response) => {
-        response.render('pages/index', { pageTitle: 'Welcome' });
+        response.render('layouts', { pageTitle: 'Welcome', template: 'index' });
     });
 
     router.use('/speakers', speakersRoute(params));
