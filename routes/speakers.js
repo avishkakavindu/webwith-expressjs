@@ -8,8 +8,11 @@ module.exports = (params) => {
     // speaker list
     router.get('/', async (request, response) => {
         const speakers = await speakersService.getList();
-
-        return response.json(speakers);
+        console.log(speakers);
+        return response.render(
+            'layouts',
+            { pageTitle: 'Speakers', template: 'speakers', speakers }
+        );
     });
 
     // speaker by name
