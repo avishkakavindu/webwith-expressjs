@@ -2,6 +2,29 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 
 const router = express.Router();
+const validations = [
+    check('name')
+        .trim()
+        .isLength({ min: 3 })
+        .escape()
+        .withMessage('A name is required'),
+    check('email')
+        .trim()
+        .isEmail()
+        .normalizeEmail()
+        .escape()
+        .withMessage('A valid email is required'),
+    check('title')
+        .trim()
+        .isLength({ min: 3 })
+        .escape()
+        .withMessage('A title is required'),
+    check('message')
+        .trim()
+        .isLength({ min: 5 })
+        .escape()
+        .withMessage('A message is required')
+];
 
 module.exports = (params) => {
     const { feedbackService } = params;
@@ -12,13 +35,15 @@ module.exports = (params) => {
             const feedbacks = await feedbackService.getList();
             // ? means if the request.session.feedback exists then: else
             const validationErrors = request.session.feedback ? request.session.feedback.errors : false;
+            const successMessage = request.session.feedback ? request.session.feedback.message : false;
             request.session.feedback = {};
-            console.log(validationErrors)
+
             const context = {
                 pageTitle: 'Feedbacks',
                 template: 'feedback',
                 feedbacks,
-                validationErrors
+                validationErrors,
+                successMessage
             }
             return response.render('layouts', context);
         } catch (error) {
@@ -28,30 +53,8 @@ module.exports = (params) => {
     });
 
     // one feedback 
-    router.post('/', [
-        check('name')
-            .trim()
-            .isLength({ min: 3 })
-            .escape()
-            .withMessage('A name is required'),
-        check('email')
-            .trim()
-            .isEmail()
-            .normalizeEmail()
-            .escape()
-            .withMessage('A valid email is required'),
-        check('title')
-            .trim()
-            .isLength({ min: 3 })
-            .escape()
-            .withMessage('A title is required'),
-        check('message')
-            .trim()
-            .isLength({ min: 5 })
-            .escape()
-            .withMessage('A message is required')
-    ],
-        (request, response, next) => {
+    router.post('/', validations,
+        async (request, response, next) => {
             try {
                 const validationErrors = validationResult(request);
 
@@ -60,15 +63,45 @@ module.exports = (params) => {
                         errors: validationErrors.array()
                     };
 
-                    return response.redirect('/feedback')
+                    return response.redirect('/feedback');
                 }
 
-                return response.send('feedback from posted');
+                const { name, email, title, message } = request.body;
+
+                await feedbackService.addEntry(name, email, title, message);
+                request.session.feedback = {
+                    message: 'Thankyou for your feedback!'
+                }
+                return response.redirect('/feedback')
             } catch (error) {
                 return next(error);
             }
 
         });
+
+    router.post('/api', validations, async (request, response, next) => {
+        try {
+            const validationErrors = validationResult(request);
+
+            if (!validationErrors.isEmpty()) {
+                const context = {
+                    errors: validationErrors.array()
+                }
+                return response.json(context)
+            }
+
+            const { name, email, title, message } = request.body;
+
+            await feedbackService.addEntry(name, email, title, message);
+
+            const feedbacks = await feedbackService.getList();
+
+            return response.json({ feedbacks });
+
+        } catch (error) {
+            return next(error);
+        }
+    });
 
     return router;
 }

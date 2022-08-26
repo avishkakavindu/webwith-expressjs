@@ -11,6 +11,10 @@
             <% }); %>
           </ul>
         </div>
+        <% } else if(successMessage){ %>
+        <div class="alert alert-success">
+          <p><%= successMessage %></p>
+        </div>
         <% } %>
         <form class="feedback-form" method="post" action="/feedback">
           <div class="form-group">
@@ -68,7 +72,7 @@
             <div class="feedback-item media">
               <div class="feedback-info media-body">
                 <div class="feedback-head">
-                  <div class="feedback-title"><%= feedback.title %></div>
+                  <div class="feedback-title"><%- feedback.title %></div>
                   <small>by <%= feedback.name %></small>
                 </div>
                 <div class="feedback-message"><%= feedback.message %></div>

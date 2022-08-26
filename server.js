@@ -25,6 +25,7 @@ app.use(cookieSession({
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(bodyParser.json())
 
 // set view engine to ejs
 app.set('view engine', 'ejs');
