@@ -55,10 +55,11 @@ app.use('/', routes({
 
 // if no route match return error message
 app.use((request, response, next) => next(createError(404, 'Page not found!')));
+
 // catches the error and renser error template
-app.use((err, request, response) => {
+app.use((err, request, response, next) => {
     response.locals.message = err.message;
-    console.error(err);
+    console.error('here\n\n\n\n', err);
     const status = err.status || 500;
     response.locals.status = status;
     // response status code
@@ -67,6 +68,8 @@ app.use((err, request, response) => {
     response.render('error');
 
 });
+
+
 
 const PORT = 3000;
 
