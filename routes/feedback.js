@@ -9,7 +9,13 @@ module.exports = (params) => {
     router.get('/', async (request, response, next) => {
         try {
             const feedbacks = await feedbackService.getList();
-            return response.json(feedbacks);
+
+            const context = {
+                pageTitle: 'Feedbacks',
+                template: 'feedback',
+                feedbacks
+            }
+            return response.render('layouts', context);
         } catch (error) {
             return next(error);
         }
