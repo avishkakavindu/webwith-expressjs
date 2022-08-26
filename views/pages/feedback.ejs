@@ -3,11 +3,21 @@
     <div class="col-md-4">
       <div class="maincontent">
         <h1>Send us feedback</h1>
-        <form class="feedback-form">
+        <% if(locals.validationErrors){ %>
+        <div class="alert alert-danger">
+          <ul>
+            <% validationErrors.forEach(error => { %>
+            <li><%= error.msg %></li>
+            <% }); %>
+          </ul>
+        </div>
+        <% } %>
+        <form class="feedback-form" method="post" action="/feedback">
           <div class="form-group">
             <label for="feedback-form-name">Name</label>
             <input
               type="text"
+              name="name"
               class="form-control"
               id="feedback-form-name"
               placeholder="Enter your name"
@@ -17,6 +27,7 @@
             <label for="feedback-form-email">E-Mail</label>
             <input
               type="text"
+              name="email"
               class="form-control"
               id="feedback-form-email"
               placeholder="Enter your email address"
@@ -26,6 +37,7 @@
             <label for="feedback-form-title">Title</label>
             <input
               type="text"
+              name="title"
               class="form-control"
               id="feedback-form-title"
               placeholder="Title of your feedback"
@@ -35,6 +47,7 @@
             <label for="feedback-form-message">Message</label>
             <textarea
               type="text"
+              name="message"
               placeholder="Enter your message, then hit the submit button"
               class="form-control"
               id="feedback-form-message"

@@ -1,6 +1,7 @@
 const express = require('express');
 const createError = require('http-errors');
 const path = require('path');
+const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 
 const FeedbackService = require('./services/FeedbackService');
@@ -19,6 +20,10 @@ app.set('trust proxy', 1);
 app.use(cookieSession({
     name: 'session',
     keys: ['Dkjvnsblu', 'HBbdhbbj'],
+}));
+
+app.use(bodyParser.urlencoded({
+    extended: true
 }));
 
 // set view engine to ejs
@@ -50,7 +55,7 @@ app.use('/', routes({
 // if no route match return error message
 app.use((request, response, next) => next(createError(404, 'Page not found!')));
 // catches the error and renser error template
-app.use((err, request, response, next) => {
+app.use((err, request, response) => {
     response.locals.message = err.message;
     console.error(err);
     const status = err.status || 500;
