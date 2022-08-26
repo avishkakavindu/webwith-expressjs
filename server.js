@@ -1,4 +1,5 @@
 const express = require('express');
+const createError = require('http-errors');
 const path = require('path');
 const cookieSession = require('cookie-session');
 
@@ -45,6 +46,21 @@ app.use('/', routes({
     feedbackService,
     speakersService
 }));
+
+// if no route match return error message
+app.use((request, response, next) => next(createError(404, 'Page not found!')));
+// catches the error and renser error template
+app.use((err, request, response, next) => {
+    response.locals.message = err.message;
+    console.error(err);
+    const status = err.status || 500;
+    response.locals.status = status;
+    // response status code
+    response.status(status);
+    // render error template error.ejs
+    response.render('error');
+
+});
 
 const PORT = 3000;
 
